@@ -4,13 +4,15 @@ export default function Recipe({recipes}) {
     const grid = formatGrid(recipes);
     console.log(grid);
     return (
-        <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-        <div style={{display: 'flex', justifyContent: 'center', flexDirection: 'column'}}>
-            {grid.map((row, i) => 
-                <div style={{display: 'flex', flexDirection: 'row'}} key={i}>
-                    {row.map((recipe, j) => <Tile recipe={recipe} key={j} />)}
-                </div>)}
-        </div>
+        <div style={{position: 'absolute', top: '25vh', height: '75vh', overflow: 'scroll'}}>
+            <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                <div style={{display: 'flex', justifyContent: 'center', flexDirection: 'column'}}>
+                    {grid.map((row, i) => 
+                        <div style={{display: 'flex', flexDirection: 'row'}} key={i}>
+                            {row.map((recipe, j) => <Tile recipe={recipe} key={j} />)}
+                        </div>)}
+                </div>
+            </div>
         </div>
         )
 }
