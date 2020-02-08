@@ -3,6 +3,7 @@ import re
 from spellchecker import SpellChecker
 from flask import Flask, request
 from flask_cors import CORS
+from string import digits
 
 app = Flask(__name__)
 CORS(app)
@@ -26,17 +27,19 @@ def debug_search(items):
 		count = 0
 		for v in val:
 			for i in items:
-				if i in v:
+				remove_num = str.maketrans('', '', digits)
+				i = i.translate(remove_num)
+				if i in v and len(i) > 2:
 					count += 1
 					break
 		return count == len(val)
 
 	a = db.search(Match.ingredients.test(test_contain, items))
 	try:
-		print(a[0])
-		return a[0]
+		print(len(a))
+		return {'recipes': a}
 	except:
-		return None
+		return {}
 
 @app.route("/recipe", methods=['POST'])
 def search_and_contain():
@@ -47,7 +50,9 @@ def search_and_contain():
 		count = 0
 		for v in val:
 			for i in items:
-				if i in v:
+				remove_num = str.maketrans('', '', digits)
+				i = i.translate(remove_num)
+				if i in v and len(i) > 2:
 					count += 1
 					break
 		return count == len(val)
@@ -69,7 +74,8 @@ if __name__ == '__main__':
 		"minced garlic",
 		"bread crumbs",
 		"large shrimp",
-		"chicken"]
+		"chicken",
+		"1"]
 	debug_search(items)
 
 	# items = [
