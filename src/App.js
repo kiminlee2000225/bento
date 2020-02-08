@@ -4,9 +4,9 @@ import posed from "react-pose";
 import logo from './bento.svg';
 import { Button, Tag, InputGroup, ControlGroup } from '@blueprintjs/core';
 import './App.css';
-
 import "@blueprintjs/core/lib/css/blueprint.css";
 import "@blueprintjs/icons/lib/css/blueprint-icons.css";
+const axios = require('axios');
 
 const Question = posed.div({
   loaded: {opacity: 0 },
@@ -67,11 +67,24 @@ function App() {
       </div>
       <GoButton pose={animationState}>
         <footer style={{position: 'absolute', bottom: '10vh', right: '10vw', textAlign: 'right'}}>
-          <Button onClick={() => setAnimationState('loaded')} large minimal disabled={ingredients.length <= 0} style={{backgroundColor: '#e34234', color: '#fff', fontWeight: 'bold', letterSpacing: '1.5px', outline: 'none'}}>GO</Button>
+          <Button onClick={async () => {
+            getRecipes(ingredients);
+            setAnimationState('loaded')
+          }} large minimal disabled={ingredients.length <= 0} style={{backgroundColor: '#e34234', color: '#fff', fontWeight: 'bold', letterSpacing: '1.5px', outline: 'none'}}>GO</Button>
         </footer>
       </GoButton>
     </div>
   );
+}
+
+async function getRecipes(ingredients) {
+  const url = "http://localhost:5000/recipe";
+  try {
+    const res = await axios.post(url, {keywords: ingredients});
+    console.log(res);
+  } catch {
+
+  }
 }
 
 export default App;

@@ -2,8 +2,10 @@ from tinydb import TinyDB, Query
 import re
 from spellchecker import SpellChecker
 from flask import Flask, request
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 spell = SpellChecker()
 db = TinyDB("all_recipes2.json")
@@ -53,9 +55,9 @@ def search_and_contain():
 	a = db.search(Match.ingredients.test(test_contain, items))
 	try:
 		# if you want all the result, change it to a
-		return a[0]
+		return {'recipes': a}
 	except:
-		return None
+		return {}
 
 
 if __name__ == '__main__':
