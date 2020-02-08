@@ -1,9 +1,10 @@
 import React from 'react';
 import ReactDOM from "react-dom";
-import posed from "react-pose";
+import posed, {PoseGroup} from "react-pose";
 import logo from './bento.svg';
 import { Button, Tag, InputGroup, ControlGroup } from '@blueprintjs/core';
 import './App.css';
+import Recipe from './Recipe';
 import "@blueprintjs/core/lib/css/blueprint.css";
 import "@blueprintjs/icons/lib/css/blueprint-icons.css";
 const axios = require('axios');
@@ -14,18 +15,25 @@ const Question = posed.div({
 });
 
 const SearchBar = posed.div({
-  loaded: {y: -200 , x: -310, scaleY: 0.6, scaleX:0.6},
+  loaded: {y: -200, x: -310, scaleY: 0.6, scaleX:0.6},
   initial: {y: 0, x: 0, scaleY: 1, scaleX: 1}
 });
 
-const Tags = posed.div({
-  loaded: {y: -220 , x: -110, staggerChildren: 200, delayChildren: 50},
-  initial: {y: 0, x: 0, staggerChildren: 200, delayChildren: 50}
+const TagsWrapper = posed.ul({
+  loaded: {staggerChildren: 30, delay: 15},
+  initial: {}
+});
+
+const TagWrapper = posed.li({
+  loaded: {y: -220, x: -110},
+  initial: {y: 0, x: 0},
+  entrance: {scaleX: 0, scaleY: 0},
+  initialPose: 'entrance'
 });
 
 const GoButton = posed.div({
-  loaded: {y: -345 , x: -230},
-  initial: {y: 0, x: 0}
+  loaded: {y: -338 , x: -330, delay: 30, scaleX: 0.75, scaleY: 0.75},
+  initial: {y: 0, x: 0, scaleX: 1, scaleY: 1}
 });
 
 
@@ -33,6 +41,7 @@ function App() {
   const [ingredients, setIngredients] = React.useState([]);
   const [input, setInput] = React.useState('');
   const [animationState, setAnimationState] = React.useState('initial');
+  const [recipes, setRecipes] = React.useState([]);
   console.log(ingredients);
   return (
     <div className="App">
@@ -59,20 +68,22 @@ function App() {
             </div>
             </SearchBar>
             <div style={{textAlign: 'left'}}>
-            <Tags pose={animationState}>
-                {ingredients.map((x) => <Tag large style={{backgroundColor: '#a1b7b7', margin: '5px', fontWeight: 'bold'}} onRemove={(e) => console.log(e)}>{x}</Tag>)}
-            </Tags>
+            <TagsWrapper style={{padding: '0px'}} pose={animationState}>
+                {ingredients.map((x, i) => <TagWrapper key={i} style={{display: 'inline-block', listStyleType: 'none'}}><Tag large style={{backgroundColor: '#a1b7b7', margin: '5px', fontWeight: 'bold'}} onRemove={() => setIngredients(ingredients.filter((_x, i2) => i2 !== i))}>{x}</Tag></TagWrapper>)}
+            </TagsWrapper>
             </div>
           </div>
       </div>
       <GoButton pose={animationState}>
         <footer style={{position: 'absolute', bottom: '10vh', right: '10vw', textAlign: 'right'}}>
           <Button onClick={async () => {
-            getRecipes(ingredients);
-            setAnimationState('loaded')
+            setRecipes(await getRecipes(ingredients));
+            setAnimationState('loaded');
+
           }} large minimal disabled={ingredients.length <= 0} style={{backgroundColor: '#e34234', color: '#fff', fontWeight: 'bold', letterSpacing: '1.5px', outline: 'none'}}>GO</Button>
         </footer>
       </GoButton>
+      {animationState==='loaded' ? <Recipe recipes={recipes}/>:<></>}
     </div>
   );
 }
@@ -81,7 +92,7 @@ async function getRecipes(ingredients) {
   const url = "http://localhost:5000/recipe";
   try {
     const res = await axios.post(url, {keywords: ingredients});
-    console.log(res);
+    return res.data.recipes;
   } catch {
 
   }
