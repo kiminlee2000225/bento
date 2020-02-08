@@ -34,9 +34,26 @@ function formatGrid(recipes) {
 
 function Tile({recipe}) {
     return(
-        <div style={{height:'400px', width:'300px', borderStyle: 'solid', margin: '10px', display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-            <div style={{height:'200px', width:'200px',borderRadius: '50%', backgroundImage: `url(${recipe.image})`, backgroundSize: 'cover', backgroundPosition: 'center'}}/>
-            <div style={{fontWeight: 'bold', fontSize: '20px', margin: '10px'}}>{recipe.name}</div>
+        <div style={{height:'300px', width:'300px', margin: '10px', display: 'flex', flexDirection: 'column', alignItems: 'center', backgroundColor:'#ffffff'}}>
+            <div style={{height:'150px', width:'150px',borderRadius: '50%', backgroundImage: `url(${recipe.image})`, backgroundSize: 'cover', backgroundPosition: 'center'}}/>
+            <div style={{fontWeight: 'bold', fontSize: '20px', margin: '10px', color:'#9b9b9b'}}>{recipe.name}</div>
+            <div style={{ fontSize: '20px', margin: '10px', fontSize: '15px', bottom:'0', color:'#848484'}}>Prep: {recipe.times[0]} {minHourPrep(recipe)} | Cook: {recipe.times[1]} {minHourCook(recipe)}</div>
         </div>
     )
+}
+
+function minHourPrep({times}) {
+    if (times[0] < 5) {
+        return "hr";
+    } else {
+        return "min"
+    }
+}
+
+function minHourCook({times}) {
+    if (times[1] < 5) {
+        return "hr";
+    } else {
+        return "min"
+    }
 }
