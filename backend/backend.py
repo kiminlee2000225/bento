@@ -1,65 +1,64 @@
 from tinydb import TinyDB, Query
 import re
-from spellchecker import SpellChecker
 from flask import Flask, request
 from flask_cors import CORS
 from string import digits
+from multiprocessing import Process, Queue
 
 app = Flask(__name__)
 CORS(app)
+shards_num = 10
 
-spell = SpellChecker()
-db = TinyDB("all_recipes_updated.json")
+q = Queue()
+# db = TinyDB("all_recipes.json")
+dbs = [None] * shards_num
+for i in range(shards_num):
+	dbs[i] = TinyDB("shards/shards_{}.json".format(i))
 Match = Query()
 
-def correct_spelling(items):
-	corrected_items = items
-	for idx, i in enumerate(items):
-		corrected_items = items[:idx] + (spell.correction(i), ) \
-		 + items[idx+1:]
+default_ingredients = ["pepper", "salt", "sugar", "flour", "oil"]
 
-	return corrected_items
+def mult_proc_func(database, func, items):
+	q.put(database.search(Match.ingredients.test(func, items)))
+
+def test_contain(val, items):
+	count = 0
+	for v in val:
+		for i in items:
+			remove_num = str.maketrans('', '', digits)
+			i = i.translate(remove_num)
+			if i in v and len(i) > 2:
+				count += 1
+				break
+	return count == len(val)
+
 
 # Same method but for testing locally without POST method
 def debug_search(items):
-	items = tuple(items)
-	def test_contain(val, items):
-		count = 0
-		for v in val:
-			for i in items:
-				remove_num = str.maketrans('', '', digits)
-				i = i.translate(remove_num)
-				if i in v and len(i) > 2:
-					count += 1
-					break
-		return count == len(val)
+	items = tuple(items + default_ingredients)
+	proc = [Process(target=mult_proc_func,args=(db,test_contain, items)) for db in dbs]
+	[p.start() for p in proc]
+	[p.join() for p in proc]
 
-	a = db.search(Match.ingredients.test(test_contain, items))
+	a = []
+	while q.qsize() > 0:
+		a += q.get()
 	try:
-		print(len(a))
 		return {'recipes': a}
 	except:
 		return {}
 
 @app.route("/recipe", methods=['POST'])
 def search_and_contain():
-	items = tuple(request.json["keywords"])
-	# too slow
-	# items = correct_spelling(items)
-	def test_contain(val, items):
-		count = 0
-		for v in val:
-			for i in items:
-				remove_num = str.maketrans('', '', digits)
-				i = i.translate(remove_num)
-				if i in v and len(i) > 2:
-					count += 1
-					break
-		return count == len(val)
+	items = tuple(default_ingredients + request.json["keywords"])
+	proc = [Process(target=mult_proc_func,args=(db,test_contain, items)) for db in dbs]
+	[p.start() for p in proc]
+	[p.join() for p in proc]
 
-	a = db.search(Match.ingredients.test(test_contain, items))
+	a = []
+	while q.qsize() > 0:
+		a += q.get()
 	try:
-		# if you want all the result, change it to a
 		return {'recipes': a}
 	except:
 		return {}
