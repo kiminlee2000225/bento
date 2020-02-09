@@ -79,10 +79,12 @@ function formatGrid(recipes) {
 
 function Tile({recipe, setDrawer}) {
     return(
+        <div className='tile'>
         <div style={{height:'300px', width:'300px', margin: '10px', display: 'flex', flexDirection: 'column', alignItems: 'center', backgroundColor:'#ffffff'}} onClick={() => setDrawer(recipe)}>
             <div style={{height:'150px', width:'150px',borderRadius: '50%', backgroundImage: `url(${recipe.image})`, backgroundSize: 'cover', backgroundPosition: 'center', margin: '13px'}}/>
             <div style={{fontWeight: 'bold', fontSize: '20px', margin: '10px', color:'#9b9b9b'}}>{recipe.name}</div>
             <div style={{ fontSize: '20px', margin: '10px', fontSize: '15px', bottom:'0', color:'#848484'}}>Prep: {recipe.times[0]} {minHourPrep(recipe)} | Cook: {recipe.times[1]} {minHourCook(recipe)}</div>
+        </div>
         </div>
     )
 }
