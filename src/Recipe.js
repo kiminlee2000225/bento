@@ -6,7 +6,7 @@ export default function Recipes({recipes}) {
     return (
         <>
             <RecipeGrid recipes={recipes} setDrawer={setDrawer}/>
-            <Drawer isOpen={!!drawer} onClose={() => setDrawer(null)}>
+            <Drawer isOpen={!!drawer} onClose={() => setDrawer(null)} size='500px'>
                 {drawer ? (
                     <RecipeDrawer recipe={drawer} />
                 ) : <></>}
@@ -17,10 +17,30 @@ export default function Recipes({recipes}) {
 
 function RecipeDrawer({recipe}) {
     return (
-        <div>
-            {recipe.name} {recipe.directions}
+        <div style={{position: 'absolute', height: '99vh', overflow: 'scroll'}}>
+            <div style={{height: '300px', width:'420px', backgroundImage: `url(${recipe.image})`, 
+            backgroundSize: 'cover', backgroundPosition: 'center', margin: '30px', marginLeft: '40px', justifyContent: 'center', alignItems: 'center'}}>
+            </div>
+            <div>
+                <div style={{marginLeft:'40px', marginTop: '15px', fontSize:'30px', fontWeight:'bold', color:'#9b9b9b'}}>{recipe.name}</div>
+                <div style={{marginLeft:'40px', marginTop: '8px', fontSize:'15px', color:'#9b9b9b'}}>Prep: {recipe.times[0]} {minHourPrep(recipe)} | Cook: {recipe.times[1]} {minHourCook(recipe)}</div>
+                <div style={{marginLeft:'40px', marginTop: '20px', fontSize:'15px', letterSpacing:'0.8px', color:'#9b9b9b', fontWeight:'bold'}}>INGREDIENTS</div>
+                <div style={{color:'#9b9b9b', marginRight:'40px', marginLeft:'40px', marginTop:'8px'}}>
+                    {recipe.ingredients.map((ingredients, j) => <li ingredients={recipe.ingredients} key={j}>{ingredients}</li>)}
+                </div>
+                <div style={{marginLeft:'40px', marginTop: '20px', fontSize:'15px', letterSpacing:'0.8px', color:'#9b9b9b', fontWeight:'bold'}}>DIRECTIONS</div>
+                <ol style={{color:'#9b9b9b', marginRight:'40px', marginLeft:'15px', marginTop:'8px'}}>
+                    {recipe.directions.map((directions, j) => <li directions={recipe.directions} key={j}>{directions}</li>)}
+                </ol>
+            </div>
         </div>
     )
+}
+
+function printIngredients({ingredients}) {
+    for (let i = 0; i < ingredients.length; ++i) {
+        
+    }
 }
 
 function RecipeGrid({recipes, setDrawer}) {
