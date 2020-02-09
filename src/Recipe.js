@@ -67,6 +67,7 @@ function RecipeGrid({recipes, setDrawer}) {
 }
 
 function formatGrid(recipes) {
+    console.log(recipes);
     const res = [];
     let row = [];
     for (let i = 0; i < recipes.length; i++) {

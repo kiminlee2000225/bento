@@ -7,7 +7,7 @@ from multiprocessing import Process, Queue
 
 app = Flask(__name__)
 CORS(app)
-shards_num = 10
+shards_num = 15
 
 q = Queue()
 # db = TinyDB("all_recipes.json")
@@ -56,7 +56,7 @@ def search_and_contain():
 	[p.join() for p in proc]
 
 	a = []
-	while q.qsize() > 0:
+	while not q.empty():
 		a += q.get()
 	try:
 		return {'recipes': a}
