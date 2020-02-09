@@ -9,7 +9,7 @@ app = Flask(__name__)
 CORS(app)
 
 spell = SpellChecker()
-db = TinyDB("all_recipes2.json")
+db = TinyDB("all_recipes_updated.json")
 Match = Query()
 
 def correct_spelling(items):
